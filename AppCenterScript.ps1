@@ -1,4 +1,11 @@
-﻿function Build-AllBranches {
+﻿<#
+.DESCRIPTION
+    Builds all provided branches. Takes username, app name, access token and an array of branches.
+
+.EXAMPLE
+    Build-AllBranches $username $appname $builds
+#>
+function Build-AllBranches {
     [CmdletBinding()]
     Param(
         [Parameter(Position=0,mandatory=$true)]
@@ -6,7 +13,10 @@
         [Parameter(Position=1,mandatory=$true)]
         [string] $app,
         [Parameter(Position=2,mandatory=$true)]
+        [string] $token,
+        [Parameter(Position=3,mandatory=$true)]
         [Object[]] $branches
+        
     )
 
     $builds = @()
@@ -17,6 +27,13 @@
     return $builds
 }
 
+<#
+.DESCRIPTION
+    Gets details for provided builds. Takes username, app name, access token and an array of builds.
+
+.EXAMPLE
+    Get-AllBuildsDetails $username $appname $builds
+#>
  function Get-AllBuildsDetails {
     [CmdletBinding()]
     Param(
@@ -25,6 +42,8 @@
         [Parameter(Position=1,mandatory=$true)]
         [string] $app,
         [Parameter(Position=2,mandatory=$true)]
+        [string] $token,
+        [Parameter(Position=3,mandatory=$true)]
         [Object[]] $builds
     )
 
@@ -50,25 +69,19 @@
     return $details
 }
 
-<#
+
 $user = Read-Host -Prompt 'Input your user name'
 $app = Read-Host -Prompt 'Input your app name'
 $token = Read-Host -Prompt 'Input your token'
-#>
-
-$user = "wrkey"
-$app = "App"
-$token = "98d98ec6f53d5483edbebadb7c2ac26d72aa0606"
-
 
 # Get all branches
 $branches = ((Invoke-RestMethod -Uri "https://api.appcenter.ms/v0.1/apps/$user/$app/branches" -Method Get -Headers @{"Accept"="application/json"; "X-API-Token"="$($token)"; "Content-Type"="application/json"}) | Select-Object branch) | Select-Object -ExpandProperty branch 
 
 # Build all branches
-$builds = Build-AllBranches $user $app $branches
+$builds = Build-AllBranches $user $app $token $branches
 
 # Get builds details
-$details = Get-AllBuildsDetails $user $app $builds
+$details = Get-AllBuildsDetails $user $app $token $builds
 
 # Preapare output data
 $output = @()
